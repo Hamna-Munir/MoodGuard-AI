@@ -1,0 +1,55 @@
+# =========================
+# Python Cache
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# =========================
+# Virtual Environment
+# =========================
+venv/
+env/
+ENV/
+.venv/
+
+# =========================
+# Environment Variables
+# =========================
+.env
+
+# =========================
+# Flask
+# =========================
+instance/
+*.log
+
+# =========================
+# Jupyter Notebook (if used)
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Model Files (optional)
+# Uncomment if you don't want to upload model
+# =========================
+# *.h5
+# *.pkl
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# TensorFlow / Cache
+# =========================
+*.h5py_cache/
