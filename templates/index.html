@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MoodGuard · AI Mental Health Monitor</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-brand">Mood<span>Guard</span></div>
+      <div class="sb-sub">AI Mental Health Monitor</div>
+    </div>
+
+    <div class="sb-section">Monitor</div>
+    <div class="sb-btn active" onclick="showPage('dashboard',this)">
+      <i class="ti ti-layout-dashboard"></i> Dashboard
+    </div>
+    <div class="sb-btn" onclick="showPage('photo',this)">
+      <i class="ti ti-camera"></i> Photo Analysis
+    </div>
+    <div class="sb-btn" onclick="showPage('video',this)">
+      <i class="ti ti-video"></i> Video Detection
+    </div>
+
+    <div class="sb-section">Records</div>
+    <div class="sb-btn" onclick="showPage('history',this)">
+      <i class="ti ti-clipboard-list"></i> History
+    </div>
+
+    <div class="sb-section">Info</div>
+    <div class="sb-btn" onclick="showPage('about',this)">
+      <i class="ti ti-info-circle"></i> About
+    </div>
+
+    <div class="sb-builder">
+      <div class="sb-builder-lbl">Built by</div>
+      <div class="sb-builder-name">Hamna Munir</div>
+      <div class="sb-builder-sub">AI/ML Engineer<br>Software Engineering Student</div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="tb-title">Mood<span>Guard</span> · AI Mental Health Monitor</div>
+        <div class="tb-sub" id="tb-sub">→ Dashboard</div>
+      </div>
+      <div class="pills">
+        <span class="pill pill-purple">66.6% accuracy</span>
+        <span class="pill">TensorFlow</span>
+        <span class="pill">OpenCV</span>
+        <span class="pill">FER2013</span>
+        <span class="pill">7 emotions</span>
+      </div>
+    </header>
+
+    <!-- ── Dashboard ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="content">
+        <div class="status-ok">
+          <i class="ti ti-check" style="font-size:13px"></i>
+          MoodGuard model loaded · 66.6% accuracy · Ready to analyze
+        </div>
+
+        <div class="metrics">
+          <div class="metric purple">
+            <div class="metric-lbl">Wellness Score</div>
+            <div class="metric-val purple" id="m-wellness">—</div>
+          </div>
+          <div class="metric pink">
+            <div class="metric-lbl">Stress Level</div>
+            <div class="metric-val red" id="m-stress">—</div>
+          </div>
+          <div class="metric amber">
+            <div class="metric-lbl">Positive Mood</div>
+            <div class="metric-val amber" id="m-positive">—</div>
+          </div>
+          <div class="metric teal">
+            <div class="metric-lbl">Dominant Mood</div>
+            <div class="metric-val teal" id="m-dominant" style="font-size:20px">—</div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="sec-title">
+              <span class="sec-dot"></span> Real-time emotion analysis
+            </div>
+            <div class="upload-zone" id="dash-drop"
+                 onclick="document.getElementById('dash-file').click()"
+                 ondragover="event.preventDefault()"
+                 ondrop="handleDrop(event,'dash')">
+              <i class="ti ti-photo-up" aria-hidden="true"></i>
+              <div class="upload-txt">Drop your photo here or browse</div>
+              <div class="upload-btn">Browse Files</div>
+            </div>
+            <input type="file" id="dash-file" accept=".jpg,.jpeg,.png"
+                   style="display:none" onchange="analyzeFile(this,'dash')">
+
+            <div id="dash-result-img" style="display:none;margin-top:12px">
+              <img id="dash-img" style="width:100%;border-radius:10px;
+                                        border:1px solid #E8E0FF" alt="">
+            </div>
+
+            <div class="bars" id="dash-bars" style="display:none;margin-top:16px">
+              <div class="sec-title">
+                <span class="sec-dot"></span> Emotion probabilities
+              </div>
+              <div id="dash-bar-rows"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="margin-bottom:10px">
+              <div class="sec-title">
+                <span class="sec-dot"></span> Current state
+              </div>
+              <div class="emotion-card" id="dash-emotion-card">
+                <div class="emotion-icon">🧠</div>
+                <div class="emotion-name" style="color:#6B4F8E">
+                  WAITING
+                </div>
+                <div class="emotion-conf">Upload a photo to analyze</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="sec-title">
+                <span class="sec-dot"></span> Mental health tips
+              </div>
+              <div id="dash-tips">
+                <div class="tip">Upload a photo to get personalized tips.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Photo Analysis ── -->
+    <div class="page" id="page-photo">
+      <div class="content">
+        <div class="grid2">
+          <div class="card">
+            <div class="sec-title">
+              <span class="sec-dot"></span> Upload image
+            </div>
+            <div class="upload-zone"
+                 onclick="document.getElementById('photo-file').click()"
+                 ondragover="event.preventDefault()"
+                 ondrop="handleDrop(event,'photo')">
+              <i class="ti ti-photo-up" aria-hidden="true"></i>
+              <div class="upload-txt">Drop your photo here or browse</div>
+              <div class="upload-btn">Browse Files</div>
+            </div>
+            <input type="file" id="photo-file" accept=".jpg,.jpeg,.png"
+                   style="display:none" onchange="analyzeFile(this,'photo')">
+            <div id="photo-preview" style="display:none;margin-top:12px">
+              <img id="photo-preview-img" style="width:100%;border-radius:10px;
+                                                  border:1px solid #E8E0FF" alt="">
+            </div>
+            <button class="analyze-btn" id="photo-btn"
+                    onclick="submitPhoto()" style="display:none">
+              <i class="ti ti-brain"></i> Analyze Emotion
+            </button>
+          </div>
+
+          <div>
+            <div class="card" style="margin-bottom:10px">
+              <div class="sec-title">
+                <span class="sec-dot"></span> Analysis result
+              </div>
+              <div class="emotion-card" id="photo-emotion-card">
+                <div class="emotion-icon">🧠</div>
+                <div class="emotion-name" style="color:#6B4F8E">WAITING</div>
+                <div class="emotion-conf">Upload a photo to analyze</div>
+              </div>
+              <div id="photo-result-img" style="display:none;margin-top:12px">
+                <div style="font-size:10px;color:#9B7EC8;
+                            text-transform:uppercase;letter-spacing:.08em;
+                            margin-bottom:6px">Detection overlay</div>
+                <img id="photo-overlay" style="width:100%;border-radius:10px;
+                                                border:1px solid #E8E0FF" alt="">
+              </div>
+            </div>
+            <div class="card">
+              <div class="sec-title">
+                <span class="sec-dot"></span> Emotion probabilities
+              </div>
+              <div id="photo-bar-rows">
+                <div style="font-size:11px;color:#9B7EC8;text-align:center;
+                            padding:1rem">No analysis yet</div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:10px">
+              <div class="sec-title">
+                <span class="sec-dot"></span> Mental health tips
+              </div>
+              <div id="photo-tips">
+                <div class="tip">Upload a photo to get personalized tips.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Video Detection ── -->
+    <div class="page" id="page-video">
+      <div class="content">
+        <div class="notice-box">
+          <i class="ti ti-info-circle" style="font-size:18px;flex-shrink:0"></i>
+          <div>
+            <strong>Live video detection</strong><br>
+            This feature uses your webcam. It works when running locally.
+            Press Start to begin real-time emotion detection.
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="sec-title">
+              <span class="sec-dot"></span> Live feed
+            </div>
+            <div class="video-controls">
+              <button class="analyze-btn" onclick="startVideo()">
+                <i class="ti ti-player-play"></i> Start Video
+              </button>
+              <button class="stop-btn" onclick="stopVideo()">
+                <i class="ti ti-player-stop"></i> Stop
+              </button>
+            </div>
+            <div id="video-area" class="upload-zone"
+                 style="min-height:280px;cursor:default;margin-top:12px">
+              <i class="ti ti-video" aria-hidden="true"></i>
+              <div class="upload-txt">Press Start to activate webcam</div>
+            </div>
+            <canvas id="video-canvas" style="display:none;width:100%;
+                                              border-radius:10px"></canvas>
+          </div>
+
+          <div>
+            <div class="card" style="margin-bottom:10px">
+              <div class="sec-title">
+                <span class="sec-dot"></span> Live emotion
+              </div>
+              <div class="emotion-card" id="video-emotion-card">
+                <div class="emotion-icon" id="video-emoji">🎥</div>
+                <div class="emotion-name" id="video-emotion-name"
+                     style="color:#6B4F8E">READY</div>
+                <div class="emotion-conf" id="video-conf">
+                  Start video to detect
+                </div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:10px">
+              <div class="sec-title">
+                <span class="sec-dot"></span> Session stats
+              </div>
+              <div class="mini-stats">
+                <div class="mini-stat">
+                  <div class="mini-val" id="v-detections">0</div>
+                  <div class="mini-lbl">Detections</div>
+                </div>
+                <div class="mini-stat">
+                  <div class="mini-val" id="v-wellness">—</div>
+                  <div class="mini-lbl">Wellness</div>
+                </div>
+                <div class="mini-stat">
+                  <div class="mini-val" id="v-stress">—</div>
+                  <div class="mini-lbl">Stress</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="sec-title">
+                <span class="sec-dot"></span> Mental health tips
+              </div>
+              <div id="video-tips">
+                <div class="tip">Start video to get real-time tips.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── History ── -->
+    <div class="page" id="page-history">
+      <div class="content">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;
+                      align-items:center;margin-bottom:1rem">
+            <div class="sec-title" style="margin-bottom:0">
+              <span class="sec-dot"></span> Emotion history
+            </div>
+            <button class="stop-btn" onclick="clearHistory()">
+              <i class="ti ti-trash"></i> Clear All
+            </button>
+          </div>
+          <div id="history-summary" class="metrics"
+               style="margin-bottom:1rem;display:none">
+            <div class="metric purple">
+              <div class="metric-lbl">Total</div>
+              <div class="metric-val purple" id="h-total">0</div>
+            </div>
+            <div class="metric amber">
+              <div class="metric-lbl">Happy</div>
+              <div class="metric-val amber" id="h-happy">0</div>
+            </div>
+            <div class="metric pink">
+              <div class="metric-lbl">Stressed</div>
+              <div class="metric-val red" id="h-stress">0</div>
+            </div>
+            <div class="metric teal">
+              <div class="metric-lbl">Dominant</div>
+              <div class="metric-val teal" id="h-dominant">—</div>
+            </div>
+          </div>
+          <div id="history-list">
+            <div class="empty-state">
+              <i class="ti ti-clipboard-list" style="font-size:2.5rem;
+                         display:block;margin-bottom:8px;color:#C4AAFE"></i>
+              No history yet — analyze some photos first
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── About ── -->
+    <div class="page" id="page-about">
+      <div class="content">
+        <div class="about-hero">
+          <div class="about-title">Mood<span>Guard</span></div>
+          <div class="about-sub">
+            MoodGuard uses deep learning to detect 7 emotional states through
+            facial expressions in real time. It provides personalized mental
+            health insights and session analytics to help students and
+            professionals monitor their emotional wellbeing proactively.
+          </div>
+          <div class="about-stats">
+            <div class="about-stat">
+              <div class="asv">66.6%</div>
+              <div class="asl">Accuracy</div>
+            </div>
+            <div class="about-stat">
+              <div class="asv">7</div>
+              <div class="asl">Emotions</div>
+            </div>
+            <div class="about-stat">
+              <div class="asv">35K+</div>
+              <div class="asl">Training images</div>
+            </div>
+            <div class="about-stat">
+              <div class="asv">CNN</div>
+              <div class="asl">Model type</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-grid">
+          <div class="card">
+            <div style="font-size:1.5rem;margin-bottom:8px">🧠</div>
+            <div class="about-card-title">The Problem</div>
+            <div class="about-card-body">1 in 4 people worldwide face mental
+              health challenges. MoodGuard provides early detection through
+              passive emotion monitoring using just your camera.</div>
+          </div>
+          <div class="card">
+            <div style="font-size:1.5rem;margin-bottom:8px">⚙️</div>
+            <div class="about-card-title">How It Works</div>
+            <div class="about-card-body">A CNN trained on 35,000+ facial
+              images detects 7 emotions. Personalized mental health tips
+              generated based on your detected emotional state.</div>
+          </div>
+          <div class="card">
+            <div style="font-size:1.5rem;margin-bottom:8px">🔒</div>
+            <div class="about-card-title">Privacy First</div>
+            <div class="about-card-body">100% local processing. No images
+              or data sent anywhere. Your emotional data never leaves
+              your machine.</div>
+          </div>
+        </div>
+
+        <div class="creator-card">
+          <div class="creator-ava">HM</div>
+          <div>
+            <div class="creator-name">Hamna Munir</div>
+            <div class="creator-title">
+              AI/ML Engineer · Software Engineering Student
+            </div>
+            <div class="creator-bio">
+              Built MoodGuard from scratch using deep learning and computer
+              vision. CNN trained on FER2013 with TensorFlow. Full-stack AI
+              system with real-time video detection. Software Engineering
+              student from Pakistan specializing in AI/ML systems.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div>MoodGuard · Built by
+        <span>Hamna Munir</span> ·
+        TensorFlow · OpenCV · Flask · FER2013
+      </div>
+      <div>v1.0 · 2026</div>
+    </footer>
+  </div>
+</div>
+
+<script src="{{ url_for('static',filename='script.js') }}"></script>
+</body>
+</html>
