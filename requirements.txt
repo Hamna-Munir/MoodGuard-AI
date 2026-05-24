@@ -1,0 +1,7 @@
+Flask==3.0.3
+tensorflow==2.10.0
+opencv-python==4.10.0.84
+numpy==1.23.5
+Pillow==10.4.0
+h5py==3.11.0
+gunicorn==22.0.0
